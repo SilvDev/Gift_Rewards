@@ -1,6 +1,6 @@
 /*
 *	Gift Rewards
-*	Copyright (C) 2021 Silvers
+*	Copyright (C) 2022 Silvers
 *
 *	This program is free software: you can redistribute it and/or modify
 *	it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 
 
-#define PLUGIN_VERSION 		"1.6"
+#define PLUGIN_VERSION 		"1.7"
 
 /*======================================================================================
 	Plugin Info:
@@ -31,6 +31,9 @@
 
 ========================================================================================
 	Change Log:
+
+1.7 (08-Mar-2022)
+	- Fixed cvar "l4d2_gift_rewards_count" not resetting the death count. Thanks to "mikaelangelis" for reporting.
 
 1.6 (04-Jul-2021)
 	- Added cvar "l4d2_gift_rewards_count" to control how many SI must die before allowing the chance of dropping a Gift.
@@ -325,7 +328,7 @@ void PatchAddress(int patch)
 
 	if( !patched && patch )
 	{
-		patched = true;	
+		patched = true;
 
 		int len = g_ByteSaved.Length;
 
@@ -594,7 +597,7 @@ public void Event_Death(Event event, const char[] name, bool dontBroadcast)
 		{
 			g_iDeathCount++;
 
-			if( g_iCvarCount == 0 || g_iCvarCount >= g_iDeathCount )
+			if( g_iCvarCount == 0 || g_iDeathCount >= g_iCvarCount )
 			{
 				if( GetRandomFloat(0.0, 1.0) <= g_fCvarDrop )
 				{
