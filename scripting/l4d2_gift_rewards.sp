@@ -529,17 +529,17 @@ bool IsAllowedGameMode()
 		int iCvarModesTog = g_hCvarModesTog.IntValue;
 		if( iCvarModesTog != 0 )
 		{
-			g_iCurrentMode = L4D_GetGameModeType();
+			if( g_iCurrentMode == 0 )
+				g_iCurrentMode = L4D_GetGameModeType();
 
-			// Left4DHooks values are flipped for these modes, sadly
-			switch( g_iCurrentMode )
+			if( g_iCurrentMode == 0 )
+				return false;
+
+			switch( g_iCurrentMode ) // Left4DHooks values are flipped for these modes, sadly
 			{
 				case 2:		g_iCurrentMode = 4;
 				case 4:		g_iCurrentMode = 2;
 			}
-
-			if( g_iCurrentMode == 0 )
-				return false;
 
 			if( !(iCvarModesTog & g_iCurrentMode) )
 				return false;
