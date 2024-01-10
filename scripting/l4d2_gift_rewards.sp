@@ -121,6 +121,8 @@ enum L4D2IntWeaponAttributes
 	MAX_SIZE_L4D2IntWeaponAttributes
 };
 
+forward void L4D_OnGameModeChange(int gamemode);
+native int L4D_GetGameModeType();
 native int L4D2_GetIntWeaponAttribute(const char[] weaponName, L4D2IntWeaponAttributes attr);
 
 
@@ -194,6 +196,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 		return APLRes_SilentFailure;
 	}
 
+	MarkNativeAsOptional("L4D_GetGameModeType");
 	MarkNativeAsOptional("L4D2_GetIntWeaponAttribute");
 
 	return APLRes_Success;
@@ -516,7 +519,6 @@ public void L4D_OnGameModeChange(int gamemode)
 	g_iCurrentMode = gamemode;
 }
 
-int g_iCurrentMode;
 bool IsAllowedGameMode()
 {
 	if( g_hCvarMPGameMode == null )
@@ -524,12 +526,24 @@ bool IsAllowedGameMode()
 
 	if( g_bLeft4DHooks )
 	{
-		if( g_iCurrentMode == 0 ) g_iCurrentMode = L4D_GetGameModeType();
-
 		int iCvarModesTog = g_hCvarModesTog.IntValue;
+		if( iCvarModesTog != 0 )
+		{
+			g_iCurrentMode = L4D_GetGameModeType();
 
-		if( iCvarModesTog && !(iCvarModesTog & g_iCurrentMode) )
-			return false;
+			// Left4DHooks values are flipped for these modes, sadly
+			switch( g_iCurrentMode )
+			{
+				case 2:		g_iCurrentMode = 4;
+				case 4:		g_iCurrentMode = 2;
+			}
+
+			if( g_iCurrentMode == 0 )
+				return false;
+
+			if( !(iCvarModesTog & g_iCurrentMode) )
+				return false;
+		}
 	}
 	else
 	{
